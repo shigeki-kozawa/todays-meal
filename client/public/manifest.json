@@ -1,0 +1,20 @@
+{
+  "name": "今日のご飯",
+  "short_name": "今日のご飯",
+  "description": "AIがあなたの今日のご飯を提案します",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fef7ee",
+  "theme_color": "#ed7720",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["food", "lifestyle"],
+  "lang": "ja"
+}

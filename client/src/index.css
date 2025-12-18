@@ -1,0 +1,192 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-gradient-start: #fef7ee;
+  --bg-gradient-end: #f0fdf5;
+  --safe-area-inset-top: env(safe-area-inset-top, 0px);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-inset-left: env(safe-area-inset-left, 0px);
+  --safe-area-inset-right: env(safe-area-inset-right, 0px);
+}
+
+html {
+  height: 100%;
+  height: -webkit-fill-available;
+}
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  padding-top: var(--safe-area-inset-top);
+  padding-bottom: var(--safe-area-inset-bottom);
+  padding-left: var(--safe-area-inset-left);
+  padding-right: var(--safe-area-inset-right);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  display: flex;
+  flex-direction: column;
+}
+
+.font-display {
+  font-family: 'Zen Maru Gothic', sans-serif;
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary-500 hover:bg-primary-600 active:bg-primary-700 text-white font-medium py-3 px-5 rounded-xl transition-all duration-150 shadow-md active:shadow-sm active:scale-[0.98] select-none;
+    min-height: 48px;
+  }
+  .btn-secondary {
+    @apply bg-accent-500 hover:bg-accent-600 active:bg-accent-700 text-white font-medium py-3 px-5 rounded-xl transition-all duration-150 shadow-md active:shadow-sm active:scale-[0.98] select-none;
+    min-height: 48px;
+  }
+  .btn-ghost {
+    @apply bg-transparent hover:bg-gray-100 active:bg-gray-200 text-gray-700 font-medium py-3 px-5 rounded-xl transition-all duration-150 select-none;
+    min-height: 48px;
+  }
+  .btn-icon {
+    @apply p-3 rounded-xl transition-all duration-150 active:scale-95 select-none;
+    min-width: 48px;
+    min-height: 48px;
+  }
+  .card {
+    @apply bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-white/50;
+  }
+  .input-field {
+    @apply w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-400 focus:ring-2 focus:ring-primary-100 outline-none transition-all duration-200 text-base;
+    min-height: 48px;
+    font-size: 16px;
+  }
+  .touch-target {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .markdown-content p {
+    margin-bottom: 0.5rem;
+  }
+  .markdown-content p:last-child {
+    margin-bottom: 0;
+  }
+  .markdown-content strong {
+    font-weight: 700;
+    color: #1f2937;
+  }
+  .markdown-content em {
+    font-style: italic;
+  }
+  .markdown-content ul,
+  .markdown-content ol {
+    margin: 0.5rem 0;
+  }
+  .markdown-content li {
+    margin-left: 1rem;
+  }
+}
+
+.message-bubble {
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.recipe-card {
+  animation: bounceIn 0.4s ease-out;
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  50% {
+    transform: scale(1.01);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+@media (max-width: 640px) {
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  body {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+}
+
+input, textarea, select {
+  font-size: 16px !important;
+}
+
+@supports (-webkit-touch-callout: none) {
+  .h-screen {
+    height: -webkit-fill-available;
+  }
+}
+
+.keyboard-open .fixed-bottom {
+  position: fixed;
+  bottom: 0;
+  transform: translateY(0);
+}
+
+@media (max-height: 500px) {
+  .modal-content {
+    max-height: 80vh;
+  }
+}
+
+.safe-bottom {
+  padding-bottom: max(16px, var(--safe-area-inset-bottom));
+}
+
+.safe-top {
+  padding-top: max(12px, var(--safe-area-inset-top));
+}

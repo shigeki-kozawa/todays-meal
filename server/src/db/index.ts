@@ -1,0 +1,92 @@
+import Database from 'better-sqlite3';
+import path from 'path';
+import fs from 'fs';
+
+const DB_PATH = process.env.DATABASE_URL || './data/todays-meal.db';
+
+let db: Database.Database;
+
+export function getDatabase(): Database.Database {
+  if (!db) {
+    const dir = path.dirname(DB_PATH);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    db = new Database(DB_PATH);
+    db.pragma('journal_mode = WAL');
+  }
+  return db;
+}
+
+export function initDatabase(): void {
+  const database = getDatabase();
+
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS users (
+      id TEXT PRIMARY KEY,
+      email TEXT UNIQUE NOT NULL,
+      password_hash TEXT,
+      name TEXT NOT NULL,
+      google_id TEXT UNIQUE,
+      avatar_url TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS conversations (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      title TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS messages (
+      id TEXT PRIMARY KEY,
+      conversation_id TEXT NOT NULL,
+      role TEXT NOT NULL,
+      content TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (conversation_id) REFERENCES conversations(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS recipes (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      ingredients TEXT NOT NULL,
+      steps TEXT NOT NULL,
+      cooking_time INTEGER,
+      calories INTEGER,
+      protein REAL,
+      fat REAL,
+      carbs REAL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS favorites (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      recipe_id TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id),
+      FOREIGN KEY (recipe_id) REFERENCES recipes(id),
+      UNIQUE(user_id, recipe_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS user_ingredients (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      ingredient TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_conversations_user_id ON conversations(user_id);
+    CREATE INDEX IF NOT EXISTS idx_messages_conversation_id ON messages(conversation_id);
+    CREATE INDEX IF NOT EXISTS idx_favorites_user_id ON favorites(user_id);
+  `);
+
+  console.log('📦 データベースを初期化しました');
+}
+
