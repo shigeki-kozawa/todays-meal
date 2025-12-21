@@ -25,6 +25,7 @@ export const sideDishRecipes: Record<string, Recipe> = {
       fat: 2,
       carbs: 5,
     },
+    imageUrl: '/images/recipe-categories/soup-japanese.png',
   },
   'コーンスープ': {
     id: 'side-dish-corn-soup',
@@ -50,6 +51,7 @@ export const sideDishRecipes: Record<string, Recipe> = {
       fat: 4,
       carbs: 18,
     },
+    imageUrl: '/images/recipe-categories/soup-western.png',
   },
   'サラダ': {
     id: 'side-dish-salad',
@@ -75,6 +77,7 @@ export const sideDishRecipes: Record<string, Recipe> = {
       fat: 5,
       carbs: 6,
     },
+    imageUrl: '/images/recipe-categories/salad.png',
   },
   'スープ': {
     id: 'side-dish-soup',
@@ -102,6 +105,7 @@ export const sideDishRecipes: Record<string, Recipe> = {
       fat: 0,
       carbs: 8,
     },
+    imageUrl: '/images/recipe-categories/soup-western.png',
   },
 }
 
