@@ -242,7 +242,7 @@ export default function ChatPage() {
     startNewChat()
   }
 
-  const handleSideDishClick = (category: string, name: string) => {
+  const handleSideDishClick = (_category: string, name: string) => {
     const recipe = sideDishRecipes[name]
     if (recipe) {
       // 付け合わせレシピとしてマーク

@@ -171,9 +171,7 @@ chatRouter.post('/', async (req: Request, res: Response) => {
         res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
         res.end();
       } catch (error) {
-        console.error('❌ Stream error:', error);
-        console.error('エラー詳細:', error instanceof Error ? error.message : String(error));
-        console.error('スタックトレース:', error instanceof Error ? error.stack : 'N/A');
+        console.error('Stream error:', error);
         res.write(`data: ${JSON.stringify({ type: 'error', data: 'エラーが発生しました' })}\n\n`);
         res.end();
       }
