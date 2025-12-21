@@ -16,6 +16,7 @@ export default function FavoritesPage() {
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null)
   const [sortKey, setSortKey] = useState<SortKey>('name')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
+  const [isFavoriteLoading, setIsFavoriteLoading] = useState(false)
 
   useEffect(() => {
     if (token) {
@@ -37,7 +38,8 @@ export default function FavoritesPage() {
   }
 
   const handleRemoveFavorite = async (recipe: Recipe) => {
-    if (!token) return
+    if (!token || isFavoriteLoading) return
+    setIsFavoriteLoading(true)
     try {
       await api.removeFavorite(token, recipe.id)
       setFavorites((prev) => prev.filter((f) => f.id !== recipe.id))
@@ -46,6 +48,8 @@ export default function FavoritesPage() {
       }
     } catch (error) {
       console.error('Failed to remove favorite:', error)
+    } finally {
+      setIsFavoriteLoading(false)
     }
   }
 

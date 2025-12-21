@@ -886,10 +886,6 @@ ${generatedRecipeNames.length > 0 ? `\n\n【重要: 重複防止】\n以下の�
       const category = getRecipeCategoryFromName(r.name);
       const imageUrl = `/images/recipe-categories/${category}.png`;
       
-      // #region agent log
-      const fs = await import('fs'); fs.appendFileSync('/Users/kozawa.shigeki/Documents/work/todays-meal/.cursor/debug.log', JSON.stringify({location:'agent/index.ts:imageUrl-generation',message:'Image URL generated',data:{recipeName:r.name,category,imageUrl},timestamp:Date.now(),sessionId:'debug-session',runId:'run2-image',hypothesisId:'A'})+'\\n');
-      // #endregion
-      
       const imageData = { imageUrl };
       
       
@@ -913,10 +909,6 @@ ${generatedRecipeNames.length > 0 ? `\n\n【重要: 重複防止】\n以下の�
         sideDishes,
         ...imageData,
       };
-      
-      // #region agent log
-      const fs2 = await import('fs'); fs2.appendFileSync('/Users/kozawa.shigeki/Documents/work/todays-meal/.cursor/debug.log', JSON.stringify({location:'agent/index.ts:final-recipe',message:'Final recipe object created',data:{recipeName:finalRecipe.name,hasImageUrl:!!finalRecipe.imageUrl,imageUrl:finalRecipe.imageUrl},timestamp:Date.now(),sessionId:'debug-session',runId:'run2-image',hypothesisId:'A,B'})+'\\n');
-      // #endregion
       
       return finalRecipe;
     }

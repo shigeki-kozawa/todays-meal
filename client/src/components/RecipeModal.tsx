@@ -88,7 +88,7 @@ export default function RecipeModal({
         {recipe.imageUrl ? (
           <div className="w-full h-48 sm:h-56 overflow-hidden">
             <img
-              src={recipe.imageUrl}
+              src={`${import.meta.env.BASE_URL || '/'}${recipe.imageUrl.replace(/^\//, '')}`}
               alt={recipe.name}
               className="w-full h-full object-cover"
             />

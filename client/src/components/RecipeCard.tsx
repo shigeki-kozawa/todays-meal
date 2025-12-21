@@ -41,9 +41,6 @@ export default function RecipeCard({
   isFavorite = false,
   compact = false,
 }: RecipeCardProps) {
-  // #region agent log
-  fetch('http://127.0.0.1:7243/ingest/6239307f-1694-4acf-8801-2adc029deba1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'RecipeCard.tsx:render',message:'RecipeCard rendering',data:{recipeName:recipe.name,hasImageUrl:!!recipe.imageUrl,imageUrl:recipe.imageUrl,fullImagePath:recipe.imageUrl ? `${import.meta.env.VITE_BASE_PATH || '/'}${recipe.imageUrl}` : null},timestamp:Date.now(),sessionId:'debug-session',runId:'run2-image',hypothesisId:'C,D'})}).catch(()=>{});
-  // #endregion
   
   return (
     <div
@@ -55,7 +52,7 @@ export default function RecipeCard({
       {recipe.imageUrl ? (
         <div className="w-full h-32 md:h-40 overflow-hidden">
           <img
-            src={recipe.imageUrl}
+            src={`${import.meta.env.BASE_URL || '/'}${recipe.imageUrl.replace(/^\//, '')}`}
             alt={recipe.name}
             className="w-full h-full object-cover"
             loading="lazy"

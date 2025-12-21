@@ -24,6 +24,7 @@ export default function ChatPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null)
   const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set())
+  const [isFavoriteLoading, setIsFavoriteLoading] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [isInitialized, setIsInitialized] = useState(false)
@@ -213,7 +214,8 @@ export default function ChatPage() {
   }
 
   const handleFavorite = async (recipe: Recipe) => {
-    if (!token) return
+    if (!token || isFavoriteLoading) return
+    setIsFavoriteLoading(true)
     try {
       if (favoriteIds.has(recipe.id)) {
         await api.removeFavorite(token, recipe.id)
@@ -228,6 +230,8 @@ export default function ChatPage() {
       }
     } catch (error) {
       console.error('Failed to toggle favorite:', error)
+    } finally {
+      setIsFavoriteLoading(false)
     }
   }
 
