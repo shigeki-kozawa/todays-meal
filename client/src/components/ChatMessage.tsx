@@ -1,7 +1,7 @@
 import { Bot, User, ChefHat } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import type { Message, Recipe, SideDish } from '../types'
+import type { Message, Recipe } from '../types'
 import RecipeCard from './RecipeCard'
 
 interface ChatMessageProps {

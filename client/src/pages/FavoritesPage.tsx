@@ -49,7 +49,7 @@ export default function FavoritesPage() {
     }
   }
 
-  const handleSideDishClick = (category: string, name: string) => {
+  const handleSideDishClick = (_category: string, name: string) => {
     const recipe = sideDishRecipes[name]
     if (recipe) {
       setSelectedRecipe(recipe)
