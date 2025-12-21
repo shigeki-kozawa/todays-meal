@@ -40,6 +40,9 @@ export interface Recipe {
     fat: number;
     carbs: number;
   };
+  imageUrl?: string;
+  sourceUrl?: string;
+  sourceName?: string;
   sideDishes?: SideDish[];
 }
 

@@ -102,7 +102,7 @@ export function formatRecipesForPrompt(recipes: RecipeKnowledgeBase[]): string {
 手順: ${recipe.steps.join(' → ')}
 調理時間: ${recipe.cookingTime}分
 カロリー: ${recipe.calories}kcal
-料理ジャンル: ${recipe.cuisineType}
+料理ジャンル: ${recipe.cuisine_type}
 難易度: ${recipe.difficulty}
 `;
   }).join('\n');

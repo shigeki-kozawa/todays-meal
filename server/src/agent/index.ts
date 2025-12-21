@@ -510,7 +510,7 @@ function getRecipeCategoryFromName(recipeName: string): string {
   const hasFish = fishKeywords.some(fish => lowerName.includes(fish));
   const fishOnlyDishes = ['塩焼き', '照り焼き', 'ムニエル', 'ホイル焼き', '西京焼き'];
   
-  if (hasFish && !hasVegetables && 
+  if (hasFish && !hasIngredientVegetables && 
       (fishOnlyDishes.some(dish => lowerName.includes(dish)) || 
        (lowerName.includes('焼き') && lowerName.length < 15))) {
     return 'grilled-fish';
@@ -522,7 +522,7 @@ function getRecipeCategoryFromName(recipeName: string): string {
   const meatKeywords = ['豚', '牛', '鶏', 'チキン', 'ポーク', 'ビーフ'];
   const hasMeat = meatKeywords.some(meat => lowerName.includes(meat));
   
-  if (!hasVegetables && 
+  if (!hasIngredientVegetables && 
       (meatOnlyDishes.some(dish => lowerName.includes(dish)) ||
        (hasMeat && lowerName.includes('ステーキ')) ||
        (hasMeat && lowerName.includes('ハンバーグ')))) {
@@ -531,7 +531,7 @@ function getRecipeCategoryFromName(recipeName: string): string {
   
   // 20. 炒め物系（一般的な炒め物）
   if (lowerName.includes('炒め') || lowerName.includes('チャンプルー') ||
-      (lowerName.includes('ソテー') && hasVegetables)) {
+      (lowerName.includes('ソテー') && hasIngredientVegetables)) {
     return 'stir-fry';
   }
   
@@ -622,7 +622,7 @@ export async function* chatStream(
     maxCookingTime: maxCookingTime || null,
   }) as any;
 
-  const allIngredients = [...new Set(analysisResult.ingredients || [])];
+  const allIngredients = [...new Set((analysisResult.ingredients || []) as string[])];
   const isValidInput = analysisResult.isValidInput;
   const specificDish = analysisResult.specificDish;
   const requestType = analysisResult.requestType;
@@ -676,7 +676,7 @@ ${conversationHistory.slice(-3).map(msg => `${msg._getType() === 'human' ? 'ユ�
       const recipe = similarRecipes[0];
       const neededIngredients = recipe.ingredients.map(ing => ing.name);
       const missingIngredients = neededIngredients.filter(
-        ing => !allIngredients.some(userIng => 
+        ing => !allIngredients.some((userIng: string) => 
           ing.toLowerCase().includes(userIng.toLowerCase()) ||
           userIng.toLowerCase().includes(ing.toLowerCase())
         )
@@ -759,7 +759,7 @@ ${preferencesText ? 'もし過去の嗜好に関連する提案なら、さり�
         allIngredients, 
         conversationHistory, 
         humanMessage, 
-        effectiveMaxCookingTime,
+        effectiveMaxCookingTime ?? null,
         preferencesText,
         generatedRecipeNames,
         successCount + 1
