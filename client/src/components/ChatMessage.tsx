@@ -122,7 +122,7 @@ export default function ChatMessage({
                     >
                       <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 group-hover:scale-105 transition-transform">
                         <img
-                          src={`/images/recipe-categories/${sideDish.category}.png`}
+                          src={`${import.meta.env.BASE_URL || '/'}images/recipe-categories/${sideDish.category}.png`}
                           alt={sideDish.name}
                           className="w-full h-full object-cover"
                         />
