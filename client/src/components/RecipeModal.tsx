@@ -45,9 +45,6 @@ export default function RecipeModal({
   onSideDishClick,
   isSideDish = false,
 }: RecipeModalProps) {
-  // #region agent log
-  fetch('http://127.0.0.1:7243/ingest/6239307f-1694-4acf-8801-2adc029deba1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'RecipeModal.tsx:render',message:'RecipeModal props',data:{recipeName:recipe.name,hasImageUrl:!!recipe.imageUrl,imageUrl:recipe.imageUrl,isSideDish},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-  // #endregion
   const { speak, cancel, isSpeaking, isSupported } = useSpeechSynthesis()
   const [currentReadingStep, setCurrentReadingStep] = useState<number | null>(null)
 

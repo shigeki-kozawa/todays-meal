@@ -204,9 +204,6 @@ export const api = {
             if (data.type === 'conversationId') {
               onConversationId(data.data)
             } else if (data.type === 'recipe') {
-              // #region agent log
-              fetch('http://127.0.0.1:7243/ingest/6239307f-1694-4acf-8801-2adc029deba1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'api.ts:207',message:'Client received recipe',data:{recipeName:data.data.name,hasImageUrl:!!data.data.imageUrl,imageUrl:data.data.imageUrl,recipeKeys:Object.keys(data.data)},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'D'})}).catch(()=>{});
-              // #endregion
               onRecipe(data.data)
             } else if (data.type === 'response') {
               onResponse(data.data)

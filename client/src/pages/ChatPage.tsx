@@ -239,19 +239,10 @@ export default function ChatPage() {
   }
 
   const handleSideDishClick = (category: string, name: string) => {
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/6239307f-1694-4acf-8801-2adc029deba1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ChatPage.tsx:handleSideDishClick:entry',message:'Side dish clicked',data:{category,name},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A,C'})}).catch(()=>{});
-    // #endregion
     const recipe = sideDishRecipes[name]
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/6239307f-1694-4acf-8801-2adc029deba1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ChatPage.tsx:handleSideDishClick:recipe',message:'Recipe from sideDishRecipes',data:{hasRecipe:!!recipe,hasImageUrl:recipe?.imageUrl,recipeName:recipe?.name},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
     if (recipe) {
       // 付け合わせレシピとしてマーク
       const recipeWithImageAndFlag = { ...recipe, isSideDish: true }
-      // #region agent log
-      fetch('http://127.0.0.1:7243/ingest/6239307f-1694-4acf-8801-2adc029deba1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ChatPage.tsx:handleSideDishClick:beforeSetState',message:'Recipe before setState',data:{hasImageUrl:recipeWithImageAndFlag.imageUrl,isSideDish:recipeWithImageAndFlag.isSideDish},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-      // #endregion
       setSelectedRecipe(recipeWithImageAndFlag as any)
     }
   }
