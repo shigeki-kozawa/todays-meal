@@ -8,6 +8,7 @@ import { chatRouter } from './routes/chat.js';
 import { favoritesRouter } from './routes/favorites.js';
 import { historyRouter } from './routes/history.js';
 import { initDatabase } from './db/index.js';
+import { seedRecipeKnowledgeBase } from './data/seed-recipes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -20,7 +21,15 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-initDatabase();
+async function initializeApp() {
+  initDatabase();
+  await seedRecipeKnowledgeBase();
+}
+
+initializeApp().catch(error => {
+  console.error('❌ アプリケーションの初期化に失敗しました:', error);
+  process.exit(1);
+});
 
 app.use('/api/auth', authRouter);
 app.use('/api/chat', chatRouter);

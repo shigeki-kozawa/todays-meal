@@ -5,6 +5,7 @@ import RecipeCard from '../components/RecipeCard'
 import RecipeModal from '../components/RecipeModal'
 import type { Recipe } from '../types'
 import { Heart, ArrowUpDown } from 'lucide-react'
+import { sideDishRecipes } from '../data/sideDishRecipes'
 
 type SortKey = 'name' | 'cookingTime' | 'calories'
 
@@ -45,6 +46,13 @@ export default function FavoritesPage() {
       }
     } catch (error) {
       console.error('Failed to remove favorite:', error)
+    }
+  }
+
+  const handleSideDishClick = (category: string, name: string) => {
+    const recipe = sideDishRecipes[name]
+    if (recipe) {
+      setSelectedRecipe(recipe)
     }
   }
 
@@ -147,6 +155,7 @@ export default function FavoritesPage() {
             onClose={() => setSelectedRecipe(null)}
             onFavorite={() => handleRemoveFavorite(selectedRecipe)}
             isFavorite
+            onSideDishClick={handleSideDishClick}
           />
         )}
       </div>

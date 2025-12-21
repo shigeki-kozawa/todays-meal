@@ -123,7 +123,7 @@ chatRouter.post('/', async (req: Request, res: Response) => {
       let responseText = '';
 
       try {
-        for await (const chunk of chatStream(message, conversationHistory, filters?.maxCookingTime)) {
+        for await (const chunk of chatStream(message, userId, conversationHistory, filters?.maxCookingTime)) {
           if (chunk.type === 'recipe') {
             recipes.push(chunk.data as Recipe);
             res.write(`data: ${JSON.stringify({ type: 'recipe', data: chunk.data })}\n\n`);
@@ -144,8 +144,8 @@ chatRouter.post('/', async (req: Request, res: Response) => {
             const existingRecipe = db.prepare('SELECT id FROM recipes WHERE id = ?').get(recipe.id);
             if (!existingRecipe) {
               db.prepare(`
-                INSERT INTO recipes (id, name, ingredients, steps, cooking_time, calories, protein, fat, carbs)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO recipes (id, name, ingredients, steps, cooking_time, calories, protein, fat, carbs, image_url, source_url, source_name)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
               `).run(
                 recipe.id,
                 recipe.name,
@@ -155,7 +155,10 @@ chatRouter.post('/', async (req: Request, res: Response) => {
                 recipe.calories,
                 recipe.nutrition.protein,
                 recipe.nutrition.fat,
-                recipe.nutrition.carbs
+                recipe.nutrition.carbs,
+                recipe.imageUrl || null,
+                recipe.sourceUrl || null,
+                recipe.sourceName || null
               );
             }
           }
@@ -186,8 +189,8 @@ chatRouter.post('/', async (req: Request, res: Response) => {
           const existingRecipe = db.prepare('SELECT id FROM recipes WHERE id = ?').get(recipe.id);
           if (!existingRecipe) {
             db.prepare(`
-              INSERT INTO recipes (id, name, ingredients, steps, cooking_time, calories, protein, fat, carbs)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+              INSERT INTO recipes (id, name, ingredients, steps, cooking_time, calories, protein, fat, carbs, image_url, source_url, source_name)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             `).run(
               recipe.id,
               recipe.name,
@@ -197,7 +200,10 @@ chatRouter.post('/', async (req: Request, res: Response) => {
               recipe.calories,
               recipe.nutrition.protein,
               recipe.nutrition.fat,
-              recipe.nutrition.carbs
+              recipe.nutrition.carbs,
+              recipe.imageUrl || null,
+              recipe.sourceUrl || null,
+              recipe.sourceName || null
             );
           }
         }

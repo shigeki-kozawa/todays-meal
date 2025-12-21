@@ -4,6 +4,12 @@ export interface User {
   name: string
 }
 
+export interface SideDish {
+  name: string
+  category: string
+  description?: string
+}
+
 export interface Recipe {
   id: string
   name: string
@@ -12,8 +18,12 @@ export interface Recipe {
   cookingTime: number
   calories: number
   nutrition: Nutrition
+  imageUrl?: string
+  sourceUrl?: string
+  sourceName?: string
   favorited_at?: string
   created_at?: string
+  sideDishes?: SideDish[]
 }
 
 export interface Ingredient {

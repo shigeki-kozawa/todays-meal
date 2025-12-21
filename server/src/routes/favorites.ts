@@ -15,7 +15,9 @@ favoritesRouter.get('/', (req: Request, res: Response) => {
     const favorites = db.prepare(`
       SELECT 
         r.id, r.name, r.ingredients, r.steps, r.cooking_time as cookingTime,
-        r.calories, r.protein, r.fat, r.carbs, f.created_at as favorited_at
+        r.calories, r.protein, r.fat, r.carbs, r.image_url as imageUrl,
+        r.source_url as sourceUrl, r.source_name as sourceName,
+        f.created_at as favorited_at
       FROM favorites f
       JOIN recipes r ON f.recipe_id = r.id
       WHERE f.user_id = ?
@@ -30,6 +32,9 @@ favoritesRouter.get('/', (req: Request, res: Response) => {
       protein: number;
       fat: number;
       carbs: number;
+      imageUrl: string | null;
+      sourceUrl: string | null;
+      sourceName: string | null;
       favorited_at: string;
     }>;
 
@@ -45,6 +50,9 @@ favoritesRouter.get('/', (req: Request, res: Response) => {
         fat: f.fat,
         carbs: f.carbs,
       },
+      imageUrl: f.imageUrl,
+      sourceUrl: f.sourceUrl,
+      sourceName: f.sourceName,
       favorited_at: f.favorited_at,
     }));
 

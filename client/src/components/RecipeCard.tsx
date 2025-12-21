@@ -9,6 +9,31 @@ interface RecipeCardProps {
   compact?: boolean
 }
 
+const getRecipeGradient = (name: string) => {
+  const gradients = [
+    'from-orange-400 to-red-500',
+    'from-green-400 to-teal-500',
+    'from-blue-400 to-indigo-500',
+    'from-purple-400 to-pink-500',
+    'from-yellow-400 to-orange-500',
+    'from-red-400 to-pink-500',
+  ]
+  const index = name.length % gradients.length
+  return gradients[index]
+}
+
+const getRecipeEmoji = (name: string) => {
+  if (name.includes('肉') || name.includes('豚') || name.includes('牛')) return '🥩'
+  if (name.includes('鶏') || name.includes('チキン')) return '🍗'
+  if (name.includes('魚') || name.includes('サーモン') || name.includes('鮭')) return '🐟'
+  if (name.includes('野菜') || name.includes('サラダ')) return '🥗'
+  if (name.includes('パスタ') || name.includes('スパゲティ')) return '🍝'
+  if (name.includes('カレー')) return '🍛'
+  if (name.includes('ご飯') || name.includes('丼')) return '🍚'
+  if (name.includes('麺') || name.includes('ラーメン') || name.includes('うどん')) return '🍜'
+  return '🍳'
+}
+
 export default function RecipeCard({
   recipe,
   onClick,
@@ -16,14 +41,34 @@ export default function RecipeCard({
   isFavorite = false,
   compact = false,
 }: RecipeCardProps) {
+  // #region agent log
+  fetch('http://127.0.0.1:7243/ingest/6239307f-1694-4acf-8801-2adc029deba1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'RecipeCard.tsx:render',message:'RecipeCard rendering',data:{recipeName:recipe.name,hasImageUrl:!!recipe.imageUrl,imageUrl:recipe.imageUrl},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C,D'})}).catch(()=>{});
+  // #endregion
+  
   return (
     <div
-      className={`bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md cursor-pointer active:scale-[0.98] transition-all duration-200 p-3 md:p-4 ${
-        compact ? '' : 'md:p-5'
+      className={`bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md cursor-pointer active:scale-[0.98] transition-all duration-200 overflow-hidden ${
+        compact ? '' : ''
       }`}
       onClick={onClick}
     >
-      <div className="flex items-start justify-between gap-2 md:gap-3">
+      {recipe.imageUrl ? (
+        <div className="w-full h-32 md:h-40 overflow-hidden">
+          <img
+            src={recipe.imageUrl}
+            alt={recipe.name}
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
+        </div>
+      ) : (
+        <div className={`w-full h-32 md:h-40 bg-gradient-to-br ${getRecipeGradient(recipe.name)} flex items-center justify-center`}>
+          <span className="text-6xl md:text-7xl" role="img" aria-label="料理">
+            {getRecipeEmoji(recipe.name)}
+          </span>
+        </div>
+      )}
+      <div className={`flex items-start justify-between gap-2 md:gap-3 p-3 md:p-4 ${compact ? '' : 'md:p-5'}`}>
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-sm md:text-base lg:text-lg text-gray-900 mb-1.5 md:mb-2 line-clamp-2">
             {recipe.name}

@@ -107,6 +107,12 @@ todays-meal/
 | DELETE | /api/favorites/:id | お気に入り削除 |
 | GET | /api/history | 履歴一覧 |
 
+## 参考ドキュメント
+
+- [Google OAuth セットアップガイド](./docs/google-oauth-setup.md)
+- [AI Models 設定](./docs/ai-models.md)
+- [要件定義](./docs/requirements.md)
+
 ## ライセンス
 
 MIT

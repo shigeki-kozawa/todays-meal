@@ -7,6 +7,7 @@ import ChatInput from '../components/ChatInput'
 import RecipeModal from '../components/RecipeModal'
 import type { Message, Recipe } from '../types'
 import { RefreshCw, Plus } from 'lucide-react'
+import { sideDishRecipes } from '../data/sideDishRecipes'
 
 const STORAGE_KEY = 'todays-meal-chat'
 
@@ -94,10 +95,10 @@ export default function ChatPage() {
     try {
       const result = await api.startChat(token)
       setConversationId(result.conversationId)
-      const newMessages = [
+      const newMessages: Message[] = [
         {
           id: `msg_${Date.now()}`,
-          role: 'assistant',
+          role: 'assistant' as const,
           content: result.message,
           recipes: result.recipes,
         },
@@ -105,10 +106,10 @@ export default function ChatPage() {
       setMessages(newMessages)
     } catch (error) {
       console.error('Failed to start chat:', error)
-      const newMessages = [
+      const newMessages: Message[] = [
         {
           id: `msg_${Date.now()}`,
-          role: 'assistant',
+          role: 'assistant' as const,
           content: 'こんにちは！今日は何を食べたいですか？🍳',
         },
       ]
@@ -142,32 +143,19 @@ export default function ChatPage() {
         // レシピが1つ届くたびに更新
         (recipe: Recipe) => {
           recipes.push(recipe)
-          
-          if (!messageAdded) {
-            // 最初のレシピが届いた時点でメッセージを追加
-            messageAdded = true
-            const assistantMessage: Message = {
-              id: assistantMessageId,
-              role: 'assistant',
-              content: '',
-              recipes: [...recipes],
-            }
-            setMessages((prev) => [...prev, assistantMessage])
-          } else {
-            // 2つ目以降は更新
-            setMessages((prev) =>
-              prev.map((msg) =>
-                msg.id === assistantMessageId
-                  ? { ...msg, recipes: [...recipes] }
-                  : msg
-              )
+          // レシピを既存のメッセージに追加
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.id === assistantMessageId
+                ? { ...msg, recipes: [...recipes] }
+                : msg
             )
-          }
+          )
         },
-        // 応答テキストが届いたら更新
+        // 応答テキストが届いたら最初にメッセージを追加
         (response: string) => {
           if (!messageAdded) {
-            // レシピなしで応答が届いた場合
+            // 最初に応答が届いた時点でメッセージを追加（レシピはまだ空）
             messageAdded = true
             const assistantMessage: Message = {
               id: assistantMessageId,
@@ -177,7 +165,7 @@ export default function ChatPage() {
             }
             setMessages((prev) => [...prev, assistantMessage])
           } else {
-            // レシピありの場合は更新
+            // 既にメッセージがある場合は内容を更新（念のため）
             setMessages((prev) =>
               prev.map((msg) =>
                 msg.id === assistantMessageId
@@ -191,19 +179,9 @@ export default function ChatPage() {
         (id: string) => {
           setConversationId(id)
         },
-        // ステータス更新（オプション）
-        (status: string) => {
-          if (!messageAdded) {
-            // ステータスメッセージを表示
-            messageAdded = true
-            const assistantMessage: Message = {
-              id: assistantMessageId,
-              role: 'assistant',
-              content: status,
-              recipes: [],
-            }
-            setMessages((prev) => [...prev, assistantMessage])
-          }
+        // ステータス更新は無視（不要）
+        () => {
+          // 何もしない
         }
       )
     } catch (error) {
@@ -260,6 +238,24 @@ export default function ChatPage() {
     startNewChat()
   }
 
+  const handleSideDishClick = (category: string, name: string) => {
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/6239307f-1694-4acf-8801-2adc029deba1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ChatPage.tsx:handleSideDishClick:entry',message:'Side dish clicked',data:{category,name},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A,C'})}).catch(()=>{});
+    // #endregion
+    const recipe = sideDishRecipes[name]
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/6239307f-1694-4acf-8801-2adc029deba1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ChatPage.tsx:handleSideDishClick:recipe',message:'Recipe from sideDishRecipes',data:{hasRecipe:!!recipe,hasImageUrl:recipe?.imageUrl,recipeName:recipe?.name},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+    // #endregion
+    if (recipe) {
+      // 付け合わせレシピとしてマーク
+      const recipeWithImageAndFlag = { ...recipe, isSideDish: true }
+      // #region agent log
+      fetch('http://127.0.0.1:7243/ingest/6239307f-1694-4acf-8801-2adc029deba1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ChatPage.tsx:handleSideDishClick:beforeSetState',message:'Recipe before setState',data:{hasImageUrl:recipeWithImageAndFlag.imageUrl,isSideDish:recipeWithImageAndFlag.isSideDish},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+      // #endregion
+      setSelectedRecipe(recipeWithImageAndFlag as any)
+    }
+  }
+
   const headerAction = (
     <button
       onClick={handleNewChat}
@@ -288,6 +284,7 @@ export default function ChatPage() {
                 onSelectRecipe={setSelectedRecipe}
                 onFavorite={handleFavorite}
                 favoriteIds={favoriteIds}
+                onSideDishClick={handleSideDishClick}
               />
             ))}
             {isLoading && (
@@ -319,6 +316,8 @@ export default function ChatPage() {
             onClose={() => setSelectedRecipe(null)}
             onFavorite={() => handleFavorite(selectedRecipe)}
             isFavorite={favoriteIds.has(selectedRecipe.id)}
+            onSideDishClick={handleSideDishClick}
+            isSideDish={(selectedRecipe as any).isSideDish}
           />
         )}
       </div>
