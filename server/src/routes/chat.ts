@@ -79,7 +79,15 @@ chatRouter.post('/', async (req: Request, res: Response) => {
     const userId = req.user!.userId;
     const { message, conversationId, filters, stream } = req.body;
 
+    console.log('=== チャットリクエスト受信 ===');
+    console.log('userId:', userId);
+    console.log('message:', message);
+    console.log('conversationId:', conversationId);
+    console.log('filters:', filters);
+    console.log('stream:', stream);
+
     if (!message) {
+      console.error('エラー: メッセージが空です');
       res.status(400).json({ error: 'メッセージは必須です' });
       return;
     }
@@ -89,6 +97,7 @@ chatRouter.post('/', async (req: Request, res: Response) => {
 
     if (!convId) {
       convId = uuidv4();
+      console.log('新しい会話を作成:', convId);
       db.prepare(
         'INSERT INTO conversations (id, user_id, title) VALUES (?, ?, ?)'
       ).run(convId, userId, message.slice(0, 50));
@@ -101,10 +110,12 @@ chatRouter.post('/', async (req: Request, res: Response) => {
     db.prepare(
       'INSERT INTO messages (id, conversation_id, role, content) VALUES (?, ?, ?, ?)'
     ).run(userMessageId, convId, 'user', message);
+    console.log('ユーザーメッセージをDB保存完了');
 
     const history = db.prepare(
       'SELECT role, content FROM messages WHERE conversation_id = ? ORDER BY created_at ASC'
     ).all(convId) as { role: string; content: string }[];
+    console.log('会話履歴取得:', history.length, '件');
 
     const conversationHistory: BaseMessage[] = history.slice(0, -1).map((msg) =>
       msg.role === 'user' ? new HumanMessage(msg.content) : new AIMessage(msg.content)
@@ -112,6 +123,7 @@ chatRouter.post('/', async (req: Request, res: Response) => {
 
     // ストリーミングモード
     if (stream) {
+      console.log('ストリーミングモード開始');
       res.setHeader('Content-Type', 'text/event-stream');
       res.setHeader('Cache-Control', 'no-cache');
       res.setHeader('Connection', 'keep-alive');
@@ -123,7 +135,9 @@ chatRouter.post('/', async (req: Request, res: Response) => {
       let responseText = '';
 
       try {
+        console.log('AI処理開始: chatStream関数を呼び出します');
         for await (const chunk of chatStream(message, userId, conversationHistory, filters?.maxCookingTime)) {
+          console.log('チャンクを受信:', chunk.type);
           if (chunk.type === 'recipe') {
             recipes.push(chunk.data as Recipe);
             res.write(`data: ${JSON.stringify({ type: 'recipe', data: chunk.data })}\n\n`);
@@ -132,12 +146,14 @@ chatRouter.post('/', async (req: Request, res: Response) => {
             res.write(`data: ${JSON.stringify({ type: 'response', data: chunk.data })}\n\n`);
           }
         }
+        console.log('AI処理完了: recipes=', recipes.length, '件, responseText=', responseText.length, '文字');
 
         // データベースに保存
         const assistantMessageId = uuidv4();
         db.prepare(
           'INSERT INTO messages (id, conversation_id, role, content) VALUES (?, ?, ?, ?)'
         ).run(assistantMessageId, convId, 'assistant', responseText);
+        console.log('アシスタントメッセージをDB保存完了');
 
         if (recipes.length > 0) {
           for (const recipe of recipes) {
@@ -162,6 +178,7 @@ chatRouter.post('/', async (req: Request, res: Response) => {
               );
             }
           }
+          console.log('レシピをDB保存完了:', recipes.length, '件');
         }
 
         db.prepare(
@@ -170,8 +187,11 @@ chatRouter.post('/', async (req: Request, res: Response) => {
 
         res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
         res.end();
+        console.log('=== チャットリクエスト完了 ===');
       } catch (error) {
-        console.error('Stream error:', error);
+        console.error('❌ Stream error:', error);
+        console.error('エラー詳細:', error instanceof Error ? error.message : String(error));
+        console.error('スタックトレース:', error instanceof Error ? error.stack : 'N/A');
         res.write(`data: ${JSON.stringify({ type: 'error', data: 'エラーが発生しました' })}\n\n`);
         res.end();
       }
