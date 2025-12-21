@@ -107,11 +107,22 @@ todays-meal/
 | DELETE | /api/favorites/:id | お気に入り削除 |
 | GET | /api/history | 履歴一覧 |
 
+## 🚀 デプロイ
+
+詳細なデプロイ手順は [DEPLOY.md](./DEPLOY.md) を参照してください。
+
+**推奨構成:**
+- **フロントエンド**: GitHub Pages（無料）
+- **バックエンド**: Railway（無料プラン）
+
+完全無料でデプロイできます！
+
 ## 参考ドキュメント
 
 - [Google OAuth セットアップガイド](./docs/google-oauth-setup.md)
 - [AI Models 設定](./docs/ai-models.md)
 - [要件定義](./docs/requirements.md)
+- [デプロイ手順](./DEPLOY.md)
 
 ## ライセンス
 
