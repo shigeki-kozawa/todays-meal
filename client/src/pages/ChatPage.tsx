@@ -6,8 +6,9 @@ import ChatMessage from '../components/ChatMessage'
 import ChatInput from '../components/ChatInput'
 import RecipeModal from '../components/RecipeModal'
 import type { Message, Recipe } from '../types'
-import { RefreshCw, Plus } from 'lucide-react'
+import { RefreshCw, Plus, Mic, MicOff } from 'lucide-react'
 import { sideDishRecipes } from '../data/sideDishRecipes'
+import { useSpeechSynthesis } from '../hooks/useSpeechSynthesis'
 
 const STORAGE_KEY = 'todays-meal-chat'
 
@@ -25,9 +26,12 @@ export default function ChatPage() {
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null)
   const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set())
   const [isFavoriteLoading, setIsFavoriteLoading] = useState(false)
+  const [isVoiceMode, setIsVoiceMode] = useState(false)
+  const [shouldStartListening, setShouldStartListening] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [isInitialized, setIsInitialized] = useState(false)
+  const { speak, cancel, isSpeaking } = useSpeechSynthesis()
 
   useEffect(() => {
     if (token && !isInitialized) {
@@ -52,6 +56,18 @@ export default function ChatPage() {
   useEffect(() => {
     scrollToBottom()
   }, [messages, scrollToBottom])
+
+  useEffect(() => {
+    if (isVoiceMode && messages.length > 0) {
+      const lastMessage = messages[messages.length - 1]
+      if (lastMessage.role === 'assistant' && lastMessage.content && !isSpeaking) {
+        cancel()
+        speak(lastMessage.content, () => {
+          setShouldStartListening(true)
+        })
+      }
+    }
+  }, [messages, isVoiceMode])
 
   const saveChatHistory = () => {
     const chatData: StoredChat = {
@@ -239,7 +255,10 @@ export default function ChatPage() {
     localStorage.removeItem(STORAGE_KEY)
     setMessages([])
     setConversationId(null)
-    startNewChat()
+    setSelectedRecipe(null)
+    setTimeout(() => {
+      startNewChat()
+    }, 100)
   }
 
   const handleSideDishClick = (_category: string, name: string) => {
@@ -252,15 +271,31 @@ export default function ChatPage() {
   }
 
   const headerAction = (
-    <button
-      onClick={handleNewChat}
-      disabled={isLoading}
-      className="flex items-center justify-center gap-1.5 px-2.5 md:px-3 py-2 rounded-xl bg-primary-50 text-primary-700 hover:bg-primary-100 active:bg-primary-200 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed touch-target"
-      title="新しい会話"
-    >
-      <Plus className="w-5 h-5" />
-      <span className="text-sm font-medium hidden lg:inline">新しい会話</span>
-    </button>
+    <div className="flex items-center gap-2">
+      <button
+        onClick={() => setIsVoiceMode(!isVoiceMode)}
+        className={`flex items-center justify-center gap-1.5 px-2.5 md:px-3 py-2 rounded-xl transition-all duration-150 touch-target ${
+          isVoiceMode
+            ? 'bg-accent-500 text-white hover:bg-accent-600'
+            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+        }`}
+        title={isVoiceMode ? "音声会話モード" : "通常モード"}
+      >
+        {isVoiceMode ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
+        <span className="text-sm font-medium hidden lg:inline">
+          {isVoiceMode ? '音声モード' : '通常モード'}
+        </span>
+      </button>
+      <button
+        onClick={handleNewChat}
+        disabled={isLoading}
+        className="flex items-center justify-center gap-1.5 px-2.5 md:px-3 py-2 rounded-xl bg-primary-50 text-primary-700 hover:bg-primary-100 active:bg-primary-200 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed touch-target"
+        title="新しい会話"
+      >
+        <Plus className="w-5 h-5" />
+        <span className="text-sm font-medium hidden lg:inline">新しい会話</span>
+      </button>
+    </div>
   )
 
   return (
@@ -302,7 +337,13 @@ export default function ChatPage() {
 
         {/* 画面下部固定の入力欄 */}
         <div className="fixed bottom-0 left-0 right-0 z-10">
-          <ChatInput onSend={handleSend} disabled={isLoading} />
+          <ChatInput 
+            onSend={handleSend} 
+            disabled={isLoading} 
+            isVoiceMode={isVoiceMode}
+            shouldStartListening={shouldStartListening}
+            onListeningStarted={() => setShouldStartListening(false)}
+          />
         </div>
 
         {selectedRecipe && (

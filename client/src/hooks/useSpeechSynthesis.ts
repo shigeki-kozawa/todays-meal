@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 
 interface UseSpeechSynthesisReturn {
-  speak: (text: string) => void;
+  speak: (text: string, onEnd?: () => void) => void;
   cancel: () => void;
   isSpeaking: boolean;
   isSupported: boolean;
@@ -30,7 +30,7 @@ export function useSpeechSynthesis(): UseSpeechSynthesisReturn {
     };
   }, [isSupported]);
 
-  const speak = useCallback((text: string) => {
+  const speak = useCallback((text: string, onEnd?: () => void) => {
     if (!isSupported) {
       console.error('Speech synthesis not supported');
       return;
@@ -55,6 +55,7 @@ export function useSpeechSynthesis(): UseSpeechSynthesisReturn {
 
     utterance.onend = () => {
       setIsSpeaking(false);
+      onEnd?.();
     };
 
     utterance.onerror = () => {

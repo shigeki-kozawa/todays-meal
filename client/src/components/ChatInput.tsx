@@ -5,9 +5,12 @@ import { useSpeechRecognition } from '../hooks/useSpeechRecognition'
 interface ChatInputProps {
   onSend: (message: string) => void
   disabled?: boolean
+  isVoiceMode?: boolean
+  shouldStartListening?: boolean
+  onListeningStarted?: () => void
 }
 
-export default function ChatInput({ onSend, disabled = false }: ChatInputProps) {
+export default function ChatInput({ onSend, disabled = false, isVoiceMode = false, shouldStartListening = false, onListeningStarted }: ChatInputProps) {
   const [message, setMessage] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const { transcript, isListening, isSupported, error, startListening, stopListening, resetTranscript } = useSpeechRecognition()
@@ -24,6 +27,13 @@ export default function ChatInput({ onSend, disabled = false }: ChatInputProps) 
       setMessage(transcript)
     }
   }, [transcript])
+
+  useEffect(() => {
+    if (isVoiceMode && shouldStartListening && !isListening && isSupported) {
+      startListening()
+      onListeningStarted?.()
+    }
+  }, [shouldStartListening, isVoiceMode])
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
@@ -67,7 +77,7 @@ export default function ChatInput({ onSend, disabled = false }: ChatInputProps) 
               enterKeyHint="send"
             />
           </div>
-          {isSupported && (
+          {(isSupported && !isVoiceMode) && (
             <button
               type="button"
               onClick={toggleVoiceInput}
@@ -81,6 +91,11 @@ export default function ChatInput({ onSend, disabled = false }: ChatInputProps) 
             >
               {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
             </button>
+          )}
+          {isVoiceMode && (
+            <div className="flex-shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center bg-accent-500 text-white">
+              {isListening ? <Mic className="w-5 h-5 animate-pulse" /> : <Mic className="w-5 h-5" />}
+            </div>
           )}
           <button
             type="submit"
